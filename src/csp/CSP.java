@@ -13,8 +13,10 @@ public class CSP {
         System.out.println("[ERROR] " + funcname + ": " + errmsg);
     }
 
-    private static boolean readFile() {
-        String funcname = "readFile";
+    private static String readNextLine(BufferedReader br) throws IOException {
+        return br.readLine().replaceAll("\\s", "");
+    }
+
     private static boolean init() {
         String funcname = "init";
 
@@ -23,7 +25,7 @@ public class CSP {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
 
-            line = br.readLine();
+            line = readNextLine(br);
             if (line.charAt(0) != 'N'
                     || line.charAt(1) != '='
                     || line.charAt(line.length() - 1) != ';') {
@@ -36,13 +38,13 @@ public class CSP {
 
             square.initArr();
 
-            line = br.readLine();
+            line = readNextLine(br);
             if (!line.equals("start=")) {
                 error(funcname, errdata);
                 return false;
             }
 
-            line = br.readLine();
+            line = readNextLine(br);
             if (!line.equals("[|")) {
                 error(funcname, errdata);
                 return false;
@@ -50,13 +52,13 @@ public class CSP {
 
             int loop = square.size;
             while(loop-- != 0) {
-                line = br.readLine();
+                line = readNextLine(br);
                 if (loop == 0) {
-                    line = line.substring(0, line.length() - 4);
+                    line = line.substring(0, line.length() - 3);
                 } else {
-                    line = line.substring(0, line.length() - 2);
+                    line = line.substring(0, line.length() - 1);
                 }
-                String [] tokens = line.split(", ");
+                String [] tokens = line.split(",");
                 for (int i = 0; i < tokens.length; i++){
                     square.arr[square.size - loop - 1][i] = Integer.parseInt(tokens[i]);
                 }
