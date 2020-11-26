@@ -15,6 +15,8 @@ public class CSP {
 
     private static boolean readFile() {
         String funcname = "readFile";
+    private static boolean init() {
+        String funcname = "init";
 
         File file = new File(inputFile);
 
@@ -73,7 +75,7 @@ public class CSP {
         System.out.println("-------[ CSP starting ]-------");
 
         square = new Square();
-        if(!readFile()) {
+        if(!init()) {
             error(funcname, "File could not be read.");
             return;
         }
