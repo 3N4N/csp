@@ -1,14 +1,15 @@
+package csp;
+
 import java.io.*;
 
 public class CSP {
 
-    private static int[][] arr;
-    private static int n;
+    private static Square square;
 
     private static final String errdata = "Data file corrupted";
     private static final String inputFile = "csp_task/data/d-10-01.txt.txt";
 
-    private static void error(String funcname, String errmsg) {
+    public static void error(String funcname, String errmsg) {
         System.out.println("[ERROR] " + funcname + ": " + errmsg);
     }
 
@@ -28,10 +29,10 @@ public class CSP {
                 return false;
             }
 
-            n = Integer.parseInt(line.substring(2, line.length() - 1));
-            System.out.println("The size of the square: " + n);
+            square.size = Integer.parseInt(line.substring(2, line.length() - 1));
+            System.out.println("The size of the square: " + square.size);
 
-            arr = new int[n][n];
+            square.initArr();
 
             line = br.readLine();
             if (!line.equals("start=")) {
@@ -45,7 +46,7 @@ public class CSP {
                 return false;
             }
 
-            int loop = n;
+            int loop = square.size;
             while(loop-- != 0) {
                 line = br.readLine();
                 if (loop == 0) {
@@ -55,7 +56,7 @@ public class CSP {
                 }
                 String [] tokens = line.split(", ");
                 for (int i = 0; i < tokens.length; i++){
-                    arr[n - loop - 1][i] = Integer.parseInt(tokens[i]);
+                    square.arr[square.size - loop - 1][i] = Integer.parseInt(tokens[i]);
                 }
             }
 
@@ -67,27 +68,17 @@ public class CSP {
         return true;
     }
 
-    private static void printSquare() {
-        System.out.println();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.print(arr[i][j] + ",");
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
     public static void main(String[] args) {
         String funcname = "main";
-        System.out.println("-------[ CSP starting ]-------");
+        System.out.println("-------[ csp.CSP starting ]-------");
 
+        square = new Square();
         if(!readFile()) {
             error(funcname, "File could not be read.");
         }
 
-        printSquare();
+        System.out.println(square);
 
-        
+
     }
 }
