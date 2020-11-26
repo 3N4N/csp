@@ -1,0 +1,7 @@
+*tags*
+*.vim
+
+.idea/
+*.iml
+
+out/
