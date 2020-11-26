@@ -70,11 +70,12 @@ public class CSP {
 
     public static void main(String[] args) {
         String funcname = "main";
-        System.out.println("-------[ csp.CSP starting ]-------");
+        System.out.println("-------[ CSP starting ]-------");
 
         square = new Square();
         if(!readFile()) {
             error(funcname, "File could not be read.");
+            return;
         }
 
         System.out.println(square);
