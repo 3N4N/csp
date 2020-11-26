@@ -22,6 +22,44 @@ public class Square {
         arr = new int[size][size];
     }
 
+    public boolean isValid(int row, int col, int num) {
+        for (int y = 0; y < size; y++) {
+            if (arr[row][y] == num) return false;
+        }
+        for (int x = 0; x < size; x++) {
+            if (arr[x][col] == num) return false;
+        }
+
+        return true;
+    }
+
+    public boolean solve(int row, int col) {
+
+        if (row == size - 1 && col == size)
+            return true;
+
+        if (col == size) {
+            row++;
+            col = 0;
+        }
+
+        if (arr[row][col] > 0)
+            return solve(row, col + 1);
+
+        for (int num = 1; num <= size; num++) {
+            if (isValid(row, col, num)) {
+                arr[row][col] = num;
+
+                if (solve(row, col + 1))
+                    return true;
+            }
+            arr[row][col] = 0;
+        }
+
+        return false;
+    }
+
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("\n");

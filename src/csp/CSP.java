@@ -85,5 +85,8 @@ public class CSP {
         System.out.println(square);
 
 
+        if (square.solve(0, 0)) {
+            System.out.println(square);
+        }
     }
 }
