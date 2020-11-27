@@ -1,6 +1,6 @@
 package csp;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Square {
     int size;
@@ -167,9 +167,60 @@ public class Square {
         return false;
     }
 
+    public boolean btMRVnLCV() {
+        CSP.nodeVisited++;
+
+        if (allAssigned()) {
+            return isSolved();
+        }
+
+        Cell cell = mrv();
+        int row = cell.row;
+        int col = cell.col;
+        Integer[] list = lcv(cell);
+
+        for (int i = 0; i < list.length; i++) {
+            Integer num = list[i];
+            if (cell.possVals.contains(num)) {
+            // if (isValid(row, col, num)) {
+                cell.val = num;
+                cell.possVals.clear();
+                cell.possVals.add(num);
+
+                for (int x = 0; x < size; x++) {
+                    cells[x][col].possVals.remove(num);
+                }
+                for (int y = 0; y < size; y++) {
+                    cells[row][y].possVals.remove(num);
+                }
+
+                if (btMRVnLCV())
+                    return true;
+            }
+            cell.val = 0;
+            cell.possVals.clear();
+            for (int k = 1; k <= size; k++) {
+                if (isValid(row, col, k))
+                    cell.possVals.add(k);
+            }
+
+            for (int x = 0; x < size; x++) {
+                if (isValid(x, col, num) && !cells[x][col].possVals.contains(num)) {
+                    cells[x][col].possVals.add(num);
+                }
+                if (isValid(row, x, num) && !cells[row][x].possVals.contains(num)) {
+                    cells[row][x].possVals.add(num);
+                }
+            }
+        }
+
+        return false;
+    }
+
     public boolean solve() {
         // return btSeq(0, 0);
-         return btMRV();
+        // return btMRV();
+        return btMRVnLCV();
     }
 
     public Cell mrv() {
@@ -193,6 +244,45 @@ public class Square {
         return cell;
     }
 
+    public Integer[] bubbleSort(Integer[] arr, int row, int col) {
+        int n = arr.length;
+        for (int i = 0; i < n-1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                int cnt1 = 0;
+                int cnt2 = 0;
+                for (int y = 0; y < size; y++) {
+                    if (cells[row][y].val == arr[j]) {
+                        cnt1++;
+                    }
+                    if (cells[row][y].val == arr[j + 1]) {
+                        cnt2++;
+                    }
+                }
+                for (int x = 0; x < size; x++) {
+                    if (cells[x][col].val == arr[j]) {
+                        cnt1++;
+                    }
+                    if (cells[row][col].val == arr[j + 1]) {
+                        cnt2++;
+                    }
+                }
+                if (cnt1 > cnt2) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+        return arr;
+    }
+
+    public Integer[] lcv(Cell cell) {
+        Integer[] possVals = cell.possVals.toArray(new Integer[0]);
+        int row = cell.row;
+        int col = cell.col;
+
+        return possVals; // bubbleSort(possVals, row, col);
+    }
 
     @Override
     public String toString() {

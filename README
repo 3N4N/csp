@@ -9,23 +9,29 @@ Results
 - N = 10 (csp_task/data/d-10-01.txt.txt):
   - Normal backtracking     : 44379
   - Backtrack w/ MRV        : 229
+  - Backtrack w/ MRV & LCV  : 366
 
 - N = 10 (csp_task/data/d-10-06.txt.txt):
   - Normal backtracking     : 2394
   - Backtrack w/ MRV        : 58
+  - Backtrack w/ MRV & LCV  : 58
 
 - N = 10 (csp_task/data/d-10-07.txt.txt):
   - Normal backtracking     : 44826
   - Backtrack w/ MRV        : 575
+  - Backtrack w/ MRV & LCV  : 586
 
 - N = 10 (csp_task/data/d-10-08.txt.txt):
   - Normal backtracking     : 8638
   - Backtrack w/ MRV        : 301
+  - Backtrack w/ MRV & LCV  : 308
 
 - N = 10 (csp_task/data/d-10-09.txt.txt):
   - Normal backtracking     : 10514
   - Backtrack w/ MRV        : 58
+  - Backtrack w/ MRV & LCV  : 58
 
 - N = 15 (csp_task/data/d-15-01.txt.txt):
   - Normal backtracking     : 949203162
   - Backtrack w/ MRV        : 1828285
+  - Backtrack w/ MRV & LCV  : 1824622
