@@ -55,7 +55,7 @@ public class Square {
         return true;
     }
 
-    public boolean backtrackSeq(int row, int col) {
+    public boolean btSeq(int row, int col) {
         CSP.nodeVisited++;
 
         if (row == size - 1 && col == size)
@@ -67,14 +67,14 @@ public class Square {
         }
 
         if (cells[row][col].val > 0) {
-            return backtrackSeq(row, col + 1);
+            return btSeq(row, col + 1);
         }
 
         for (int num = 1; num <= size; num++) {
             if (isValid(row, col, num)) {
                 cells[row][col].val = num;
 
-                if (backtrackSeq(row, col + 1))
+                if (btSeq(row, col + 1))
                     return true;
             }
             cells[row][col].val = 0;
@@ -115,7 +115,7 @@ public class Square {
         return true;
     }
 
-    public boolean backtrack() {
+    public boolean btMRV() {
         CSP.nodeVisited++;
 
         if (allAssigned()) {
@@ -142,19 +142,24 @@ public class Square {
                     cells[row][y].possVals.remove(Integer.valueOf(num));
                 }
 
-                if (backtrack())
+                if (btMRV())
                     return true;
             }
             cell.val = 0;
             cell.possVals.clear();
-            for (int i = 1; i <= size; i++) {
-                if (isValid(row, col, i))
-                    cell.possVals.add(i);
+            for (int k = 1; k <= size; k++) {
+                if (isValid(row, col, k))
+                    cell.possVals.add(k);
             }
+
             for (int x = 0; x < size; x++) {
-                if (validFlag && !cells[x][col].possVals.contains(num)) {
-                    cells[row][x].possVals.add(num);
+                if (isValid(x, col, num)
+                        && !cells[x][col].possVals.contains(num)) {
                     cells[x][col].possVals.add(num);
+                }
+                if (isValid(row, x, num)
+                        && !cells[row][x].possVals.contains(num)) {
+                    cells[row][x].possVals.add(num);
                 }
             }
         }
@@ -163,8 +168,8 @@ public class Square {
     }
 
     public boolean solve() {
-        // return backtrackSeq(0, 0);
-        return backtrack();
+        // return btSeq(0, 0);
+         return btMRV();
     }
 
     public Cell mrv() {
