@@ -115,6 +115,16 @@ public class Square {
         return true;
     }
 
+    public boolean noPosVal() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j].val == 0 && cells[i][j].possVals.size() == 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     public boolean btMRV() {
         CSP.nodeVisited++;
 
@@ -127,23 +137,18 @@ public class Square {
         int col = cell.col;
 
         for (int num = 1; num <= size; num++) {
-            boolean validFlag = false;
             if (cell.possVals.contains(num)) {
             // if (isValid(row, col, num)) {
-                validFlag = true;
                 cell.val = num;
                 cell.possVals.clear();
                 cell.possVals.add(num);
 
                 for (int x = 0; x < size; x++) {
                     cells[x][col].possVals.remove(Integer.valueOf(num));
-                }
-                for (int y = 0; y < size; y++) {
-                    cells[row][y].possVals.remove(Integer.valueOf(num));
+                    cells[row][x].possVals.remove(Integer.valueOf(num));
                 }
 
-                if (btMRV())
-                    return true;
+                if (btMRV()) return true;
             }
             cell.val = 0;
             cell.possVals.clear();
@@ -173,6 +178,7 @@ public class Square {
         if (allAssigned()) {
             return isSolved();
         }
+        if (noPosVal()) return false;
 
         Cell cell = mrv();
         int row = cell.row;
@@ -189,13 +195,10 @@ public class Square {
 
                 for (int x = 0; x < size; x++) {
                     cells[x][col].possVals.remove(num);
-                }
-                for (int y = 0; y < size; y++) {
-                    cells[row][y].possVals.remove(num);
+                    cells[row][x].possVals.remove(num);
                 }
 
-                if (btMRVnLCV())
-                    return true;
+                if (btMRVnLCV()) return true;
             }
             cell.val = 0;
             cell.possVals.clear();
@@ -250,21 +253,11 @@ public class Square {
             for (int j = 0; j < n - i - 1; j++) {
                 int cnt1 = 0;
                 int cnt2 = 0;
-                for (int y = 0; y < size; y++) {
-                    if (cells[row][y].val == arr[j]) {
-                        cnt1++;
-                    }
-                    if (cells[row][y].val == arr[j + 1]) {
-                        cnt2++;
-                    }
-                }
                 for (int x = 0; x < size; x++) {
-                    if (cells[x][col].val == arr[j]) {
-                        cnt1++;
-                    }
-                    if (cells[row][col].val == arr[j + 1]) {
-                        cnt2++;
-                    }
+                    if (cells[x][col].val == arr[j]) cnt1++;
+                    if (cells[row][x].val == arr[j]) cnt1++;
+                    if (cells[x][col].val == arr[j + 1]) cnt2++;
+                    if (cells[row][x].val == arr[j + 1]) cnt2++;
                 }
                 if (cnt1 > cnt2) {
                     int temp = arr[j];
@@ -281,7 +274,7 @@ public class Square {
         int row = cell.row;
         int col = cell.col;
 
-        return possVals; // bubbleSort(possVals, row, col);
+        return bubbleSort(possVals, row, col);
     }
 
     @Override
