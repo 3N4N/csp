@@ -7,25 +7,25 @@ Results
 -------
 
 - N = 10 (csp_task/data/d-10-01.txt.txt):
-  - Normal backtracking:  44379
-  - Backtrack w/ MRV:     3736 - 4968 (isValid - possVals.contains)
+  - Normal backtracking     : 44379
+  - Backtrack w/ MRV        : 229
 
 - N = 10 (csp_task/data/d-10-06.txt.txt):
-  - Normal backtracking:  2394
-  - Backtrack w/ MRV:     58
+  - Normal backtracking     : 2394
+  - Backtrack w/ MRV        : 58
 
 - N = 10 (csp_task/data/d-10-07.txt.txt):
-  - Normal backtracking:  44826
-  - Backtrack w/ MRV:     7976 - 31884 (isValid - possVals.contains)
+  - Normal backtracking     : 44826
+  - Backtrack w/ MRV        : 575
 
 - N = 10 (csp_task/data/d-10-08.txt.txt):
-  - Normal backtracking:  8638
-  - Backtrack w/ MRV:     5544
+  - Normal backtracking     : 8638
+  - Backtrack w/ MRV        : 301
 
 - N = 10 (csp_task/data/d-10-09.txt.txt):
-  - Normal backtracking:  10514
-  - Backtrack w/ MRV:     58
+  - Normal backtracking     : 10514
+  - Backtrack w/ MRV        : 58
 
 - N = 15 (csp_task/data/d-15-01.txt.txt):
-  - Normal backtracking:  949203162
-  - Backtrack w/ MRV:     19907942 - 11135999 (isValid - possVals.contains)
+  - Normal backtracking     : 949203162
+  - Backtrack w/ MRV        : 1828285
