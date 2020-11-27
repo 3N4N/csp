@@ -126,12 +126,12 @@ public class Square {
                     cell.possVals.add(i);
             }
             for (int x = 0; x < size; x++) {
-                if (cells[x][col].possVals.contains(num)) {
+                if (!cells[x][col].possVals.contains(num)) {
                     cells[x][col].possVals.add(num);
                 }
             }
             for (int y = 0; y < size; y++) {
-                if (cells[row][y].possVals.contains(num)) {
+                if (!cells[row][y].possVals.contains(num)) {
                     cells[row][y].possVals.add(num);
                 }
             }
@@ -141,7 +141,7 @@ public class Square {
     }
 
     public boolean solve() {
-//       return backtrackSeq(0, 0);
+        // return backtrackSeq(0, 0);
         return backtrack();
     }
 
