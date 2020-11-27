@@ -1,6 +1,6 @@
 package csp;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Square {
     int size;
@@ -55,7 +55,7 @@ public class Square {
         return true;
     }
 
-    public boolean backtrackSeq(int row, int col) {
+    public boolean backtrack(int row, int col) {
         CSP.nodeVisited++;
 
         if (row == size - 1 && col == size)
@@ -67,14 +67,14 @@ public class Square {
         }
 
         if (cells[row][col].val > 0) {
-            return backtrackSeq(row, col + 1);
+            return backtrack(row, col + 1);
         }
 
         for (int num = 1; num <= size; num++) {
             if (isValid(row, col, num)) {
                 cells[row][col].val = num;
 
-                if (backtrackSeq(row, col + 1))
+                if (backtrack(row, col + 1))
                     return true;
             }
             cells[row][col].val = 0;
@@ -115,46 +115,59 @@ public class Square {
         return true;
     }
 
-    public boolean backtrack() {
+    public boolean noPosVal() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j].val == 0 && cells[i][j].possVals.size() == 0)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean forwardCheck() {
         CSP.nodeVisited++;
 
         if (allAssigned()) {
             return isSolved();
         }
 
-        Cell cell = mrv();
+        // Cell cell = seqH();
+        Cell cell = sdfH();
         int row = cell.row;
         int col = cell.col;
+        Integer[] list = cell.possVals.toArray(new Integer[0]);
 
-        for (int num = 1; num <= size; num++) {
-            boolean validFlag = false;
+        for (int i = 0; i < list.length; i++) {
+            Integer num = list[i];
             if (cell.possVals.contains(num)) {
             // if (isValid(row, col, num)) {
-                validFlag = true;
                 cell.val = num;
                 cell.possVals.clear();
                 cell.possVals.add(num);
 
                 for (int x = 0; x < size; x++) {
-                    cells[x][col].possVals.remove(Integer.valueOf(num));
-                }
-                for (int y = 0; y < size; y++) {
-                    cells[row][y].possVals.remove(Integer.valueOf(num));
+                    cells[x][col].possVals.remove(num);
+                    cells[row][x].possVals.remove(num);
                 }
 
-                if (backtrack())
-                    return true;
+                if (forwardCheck()) return true;
             }
             cell.val = 0;
             cell.possVals.clear();
-            for (int i = 1; i <= size; i++) {
-                if (isValid(row, col, i))
-                    cell.possVals.add(i);
+            for (int k = 1; k <= size; k++) {
+                if (isValid(row, col, k))
+                    cell.possVals.add(k);
             }
+
             for (int x = 0; x < size; x++) {
-                if (validFlag && !cells[x][col].possVals.contains(num)) {
-                    cells[row][x].possVals.add(num);
+                if (isValid(x, col, num)
+                        && !cells[x][col].possVals.contains(num)) {
                     cells[x][col].possVals.add(num);
+                }
+                if (isValid(row, x, num)
+                        && !cells[row][x].possVals.contains(num)) {
+                    cells[row][x].possVals.add(num);
                 }
             }
         }
@@ -162,12 +175,18 @@ public class Square {
         return false;
     }
 
-    public boolean solve() {
-        // return backtrackSeq(0, 0);
-        return backtrack();
+    public Cell seqH() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j].val == 0) {
+                    return cells[i][j];
+                }
+            }
+        }
+        return null;
     }
 
-    public Cell mrv() {
+    public Cell sdfH() {
         ArrayList<Cell> unassigned = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -188,6 +207,12 @@ public class Square {
         return cell;
     }
 
+    public boolean solve() {
+        // return btSeq(0, 0);
+        // return backtrack(0,0);
+        return forwardCheck();
+        // return btMRVnLCV();
+    }
 
     @Override
     public String toString() {

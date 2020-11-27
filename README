@@ -6,26 +6,32 @@ This is an assignment for Level-3/Term-2.
 Results
 -------
 
-- N = 10 (csp_task/data/d-10-01.txt.txt):
-  - Normal backtracking:  44379
-  - Backtrack w/ MRV:     3736 - 4968 (isValid - possVals.contains)
+- N = 10 (csp_task/data/d-10-01.txt.txt)
+  - Normal backtracking     : 44379
+  - Forward checking        : 18977
+  - Forward checking w/ SDF : 366
 
-- N = 10 (csp_task/data/d-10-06.txt.txt):
-  - Normal backtracking:  2394
-  - Backtrack w/ MRV:     58
+- N = 10 (csp_task/data/d-10-06.txt.txt)
+  - Normal backtracking     : 2394
+  - Forward checking        : 2457
+  - Forward checking w/ SDF : 58
 
-- N = 10 (csp_task/data/d-10-07.txt.txt):
-  - Normal backtracking:  44826
-  - Backtrack w/ MRV:     7976 - 31884 (isValid - possVals.contains)
+- N = 10 (csp_task/data/d-10-07.txt.txt)
+  - Normal backtracking     : 44826
+  - Forward checking        : 14931
+  - Forward checking w/ SDF : 586
 
-- N = 10 (csp_task/data/d-10-08.txt.txt):
-  - Normal backtracking:  8638
-  - Backtrack w/ MRV:     5544
+- N = 10 (csp_task/data/d-10-08.txt.txt)
+  - Normal backtracking     : 8638
+  - Forward checking        : 3993
+  - Forward checking w/ SDF : 308
 
-- N = 10 (csp_task/data/d-10-09.txt.txt):
-  - Normal backtracking:  10514
-  - Backtrack w/ MRV:     58
+- N = 10 (csp_task/data/d-10-09.txt.txt)
+  - Normal backtracking     : 10514
+  - Forward checking        : 834
+  - Forward checking w/ SDF : 58
 
-- N = 15 (csp_task/data/d-15-01.txt.txt):
-  - Normal backtracking:  949203162
-  - Backtrack w/ MRV:     19907942 - 11135999 (isValid - possVals.contains)
+- N = 15 (csp_task/data/d-15-01.txt.txt)
+  - Normal backtracking     : 949203162
+  - Forward checking        : 204143450
+  - Forward checking w/ SDF : 1824622
