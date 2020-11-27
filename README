@@ -8,24 +8,24 @@ Results
 
 - N = 10 (csp_task/data/d-10-01.txt.txt):
   - Normal backtracking: 44379
-  - Backtrack w/ SDF: 268
+  - Backtrack w/ MRV: 268
 
 - N = 10 (csp_task/data/d-10-06.txt.txt):
   - Normal backtracking: 2394
-  - Backtrack w/ SDF: 95
+  - Backtrack w/ MRV: 95
 
 - N = 10 (csp_task/data/d-10-07.txt.txt):
   - Normal backtracking: 44826
-  - Backtrack w/ SDF: 59
+  - Backtrack w/ MRV: 59
 
 - N = 10 (csp_task/data/d-10-08.txt.txt):
   - Normal backtracking: 8638
-  - Backtrack w/ SDF: 72
+  - Backtrack w/ MRV: 72
 
 - N = 10 (csp_task/data/d-10-09.txt.txt):
   - Normal backtracking: 10514
-  - Backtrack w/ SDF: 60
+  - Backtrack w/ MRV: 60
 
 - N = 15 (csp_task/data/d-15-01.txt.txt):
   - Normal backtracking: 949203162
-  - Backtrack w/ SDF: 109
+  - Backtrack w/ MRV: 109

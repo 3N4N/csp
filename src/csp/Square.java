@@ -99,7 +99,7 @@ public class Square {
 
         if (isSolved()) return true;
 
-        Cell cell = sdf();
+        Cell cell = mrv();
         int row = cell.row;
         int col = cell.col;
 
@@ -145,7 +145,7 @@ public class Square {
         return backtrack();
     }
 
-    public Cell sdf() {
+    public Cell mrv() {
         ArrayList<Cell> unassigned = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
