@@ -96,7 +96,7 @@ public class CSP {
         square.update();
 
         nodeVisited = 0;
-        if (square.solve()) {
+        if (square.solve() && square.isSolved()) {
             System.out.println("Solved Latin Square:");
             System.out.println(square);
         }

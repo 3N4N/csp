@@ -83,11 +83,32 @@ public class Square {
         return false;
     }
 
+    public boolean allAssigned() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int val = cells[i][j].val;
+                if (val == 0) return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean isSolved() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0)
+                int val = cells[i][j].val;
+                if (val == 0) {
                     return false;
+                }
+                for (int x = 0; x < size; x++) {
+                    if (x != i && cells[x][j].val == val) {
+                        return false;
+                    }
+                    if (x != j && cells[i][x].val == val) {
+                        return false;
+                    }
+                }
             }
         }
 
@@ -97,14 +118,19 @@ public class Square {
     public boolean backtrack() {
         CSP.nodeVisited++;
 
-        if (isSolved()) return true;
+        if (allAssigned()) {
+            return isSolved();
+        }
 
         Cell cell = mrv();
         int row = cell.row;
         int col = cell.col;
 
         for (int num = 1; num <= size; num++) {
+            boolean validFlag = false;
             if (cell.possVals.contains(num)) {
+            // if (isValid(row, col, num)) {
+                validFlag = true;
                 cell.val = num;
                 cell.possVals.clear();
                 cell.possVals.add(num);
@@ -126,13 +152,9 @@ public class Square {
                     cell.possVals.add(i);
             }
             for (int x = 0; x < size; x++) {
-                if (!cells[x][col].possVals.contains(num)) {
+                if (validFlag && !cells[x][col].possVals.contains(num)) {
+                    cells[row][x].possVals.add(num);
                     cells[x][col].possVals.add(num);
-                }
-            }
-            for (int y = 0; y < size; y++) {
-                if (!cells[row][y].possVals.contains(num)) {
-                    cells[row][y].possVals.add(num);
                 }
             }
         }
