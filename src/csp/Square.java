@@ -202,8 +202,8 @@ public class Square {
 
         if (allAssigned()) return isSolved();
 
-         Cell cell = seqH();
-//        Cell cell = sdfH();
+//         Cell cell = seqH();
+        Cell cell = sdfH();
         int row = cell.row;
         int col = cell.col;
         Integer[] list = cell.possVals.toArray(new Integer[0]);
