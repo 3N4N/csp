@@ -275,20 +275,13 @@ public class Square {
         Cell cell = null;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0) {
-                    unassigned.add(cells[i][j]);
+                if (cells[i][j].val == 0 && cells[i][j].possVals.size() < min) {
+                    min = cells[i][j].possVals.size();
+                    cell = cells[i][j];
                 }
             }
         }
 
-        int min = Integer.MAX_VALUE;
-        Cell cell = null;
-        for (int i = 0; i < unassigned.size(); i++) {
-            if (unassigned.get(i).possVals.size() < min) {
-                min = unassigned.get(i).possVals.size();
-                cell = unassigned.get(i);
-            }
-        }
         return cell;
     }
 
