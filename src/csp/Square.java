@@ -200,10 +200,9 @@ public class Square {
     public boolean forwardCheck() {
         CSP.nodeVisited++;
 
-        if (noPosVal()) return false;
         if (allAssigned()) return isSolved();
 
-        // Cell cell = seqH();
+//         Cell cell = seqH();
         Cell cell = sdfH();
         int row = cell.row;
         int col = cell.col;
@@ -219,7 +218,7 @@ public class Square {
                 cells[row][x].possVals.remove(num);
             }
 
-            if (forwardCheck()) return true;
+            if (!noPosVal() && forwardCheck()) return true;
 
             cell.val = 0;
             cell.possVals.clear();

@@ -9,30 +9,30 @@ Results
 
 - N = 10 (csp_task/data/d-10-01.txt.txt)
   - Normal backtracking     : 44379
-  - Forward checking        : 18977
-  - Forward checking w/ SDF : 366
+  - Forward checking        : 5639
+  - Forward checking w/ SDF : 341
 
 - N = 10 (csp_task/data/d-10-06.txt.txt)
   - Normal backtracking     : 2394
-  - Forward checking        : 2457
+  - Forward checking        : 99
   - Forward checking w/ SDF : 58
 
 - N = 10 (csp_task/data/d-10-07.txt.txt)
   - Normal backtracking     : 44826
-  - Forward checking        : 14931
-  - Forward checking w/ SDF : 586
+  - Forward checking        : 1553
+  - Forward checking w/ SDF : 548
 
 - N = 10 (csp_task/data/d-10-08.txt.txt)
   - Normal backtracking     : 8638
-  - Forward checking        : 3993
-  - Forward checking w/ SDF : 308
+  - Forward checking        : 1739
+  - Forward checking w/ SDF : 285
 
 - N = 10 (csp_task/data/d-10-09.txt.txt)
   - Normal backtracking     : 10514
-  - Forward checking        : 834
+  - Forward checking        : 408
   - Forward checking w/ SDF : 58
 
 - N = 15 (csp_task/data/d-15-01.txt.txt)
   - Normal backtracking     : 949203162
   - Forward checking        : 204143450
-  - Forward checking w/ SDF : 1824622
+  - Forward checking w/ SDF : 1620732

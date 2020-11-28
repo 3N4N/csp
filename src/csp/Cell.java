@@ -5,8 +5,6 @@ import java.util.ArrayList;
 /**
  * Holds the position,value, and domain
  * of a cell in a Latin Square.
- * <p>
- *
  */
 public class Cell {
     int row;
