@@ -103,34 +103,6 @@ public class Square {
         return true;
     }
 
-    public boolean backtrack(int row, int col) {
-        CSP.nodeVisited++;
-
-        if (row == size - 1 && col == size)
-            return true;
-
-        if (col == size) {
-            row++;
-            col = 0;
-        }
-
-        if (cells[row][col].val > 0) {
-            return backtrack(row, col + 1);
-        }
-
-        for (int num = 1; num <= size; num++) {
-            if (isValid(row, col, num)) {
-                cells[row][col].val = num;
-
-                if (backtrack(row, col + 1))
-                    return true;
-            }
-            cells[row][col].val = 0;
-        }
-
-        return false;
-    }
-
     /**
      * Checks if all the cells are assigned a value.
      * <p>
@@ -187,7 +159,7 @@ public class Square {
      *
      * @return true if any unassigned cell have zero domain.
      */
-    public boolean noPosVal() {
+    public boolean fowardcheck() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (cells[i][j].val == 0 && cells[i][j].possVals.size() == 0)
@@ -197,46 +169,68 @@ public class Square {
         return false;
     }
 
-    public boolean forwardCheck() {
+    /**
+     * Assigns a value to a cell and updates the domains of its neighbours.
+     *
+     * @param cell the cell to be assigned val
+     * @param val the value to be assigned to cell
+     */
+    public void assign(Cell cell, Integer val) {
+        int row = cell.row;
+        int col = cell.col;
+
+        cell.val = val;
+        cell.possVals.clear();
+        cell.possVals.add(val);
+
+        for (int x = 0; x < size; x++) {
+            cells[x][col].possVals.remove(val);
+            cells[row][x].possVals.remove(val);
+        }
+    }
+
+    /**
+     * Unassigns a cell and updates the domains its neighbours.
+     */
+    public void unassign(Cell cell, Integer val) {
+        int row = cell.row;
+        int col = cell.col;
+
+        cell.val = 0;
+        cell.possVals.clear();
+        for (int k = 1; k <= size; k++) {
+            if (isValid(row, col, k))
+                cell.possVals.add(k);
+        }
+
+        for (int x = 0; x < size; x++) {
+            if (isValid(x, col, val)
+                    && !cells[x][col].possVals.contains(val)) {
+                cells[x][col].possVals.add(val);
+            }
+            if (isValid(row, x, val)
+                    && !cells[row][x].possVals.contains(val)) {
+                cells[row][x].possVals.add(val);
+            }
+        }
+    }
+
+    public boolean backtrack() {
         CSP.nodeVisited++;
 
         if (allAssigned()) return isSolved();
 
-//         Cell cell = seqH();
+        // Cell cell = seqH();
         Cell cell = sdfH();
-        int row = cell.row;
-        int col = cell.col;
         Integer[] list = cell.possVals.toArray(new Integer[0]);
 
-        for (Integer num : list) {
-            cell.val = num;
-            cell.possVals.clear();
-            cell.possVals.add(num);
+        for (Integer val : list) {
+            assign(cell, val);
 
-            for (int x = 0; x < size; x++) {
-                cells[x][col].possVals.remove(num);
-                cells[row][x].possVals.remove(num);
-            }
+            // if (backtrack()) return true;
+            if (!fowardcheck() && backtrack()) return true;
 
-            if (!noPosVal() && forwardCheck()) return true;
-
-            cell.val = 0;
-            cell.possVals.clear();
-            for (int k = 1; k <= size; k++) {
-                if (isValid(row, col, k))
-                    cell.possVals.add(k);
-            }
-
-            for (int x = 0; x < size; x++) {
-                if (isValid(x, col, num)
-                        && !cells[x][col].possVals.contains(num)) {
-                    cells[x][col].possVals.add(num);
-                }
-                if (isValid(row, x, num)
-                        && !cells[row][x].possVals.contains(num)) {
-                    cells[row][x].possVals.add(num);
-                }
-            }
+            unassign(cell, val);
         }
 
         return false;
@@ -290,10 +284,7 @@ public class Square {
      * @return true if the square is solved.
      */
     public boolean solve() {
-        // return btSeq(0, 0);
-        // return backtrack(0,0);
-        return forwardCheck();
-        // return btMRVnLCV();
+        return backtrack();
     }
 
     @Override
