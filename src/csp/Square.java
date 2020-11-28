@@ -128,9 +128,8 @@ public class Square {
     public boolean forwardCheck() {
         CSP.nodeVisited++;
 
-        if (allAssigned()) {
-            return isSolved();
-        }
+        if (noPosVal()) return false;
+        if (allAssigned()) return isSolved();
 
         // Cell cell = seqH();
         Cell cell = sdfH();
@@ -138,21 +137,20 @@ public class Square {
         int col = cell.col;
         Integer[] list = cell.possVals.toArray(new Integer[0]);
 
-        for (int i = 0; i < list.length; i++) {
-            Integer num = list[i];
-            if (cell.possVals.contains(num)) {
-            // if (isValid(row, col, num)) {
-                cell.val = num;
-                cell.possVals.clear();
-                cell.possVals.add(num);
+        // for (int i = 0; i < list.length; i++) {
+        //     Integer num = list[i];
+        for (Integer num : list) {
+            cell.val = num;
+            cell.possVals.clear();
+            cell.possVals.add(num);
 
-                for (int x = 0; x < size; x++) {
-                    cells[x][col].possVals.remove(num);
-                    cells[row][x].possVals.remove(num);
-                }
-
-                if (forwardCheck()) return true;
+            for (int x = 0; x < size; x++) {
+                cells[x][col].possVals.remove(num);
+                cells[row][x].possVals.remove(num);
             }
+
+            if (forwardCheck()) return true;
+
             cell.val = 0;
             cell.possVals.clear();
             for (int k = 1; k <= size; k++) {
