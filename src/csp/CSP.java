@@ -10,12 +10,12 @@ public class CSP {
     public static int nodeVisited = 0;
 
     private static final String errdata = "Data file corrupted.";
-    // private static final String inputFile = "csp_task/data/d-10-01.txt.txt";
+    private static final String inputFile = "csp_task/data/d-10-01.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-06.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-07.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-08.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-09.txt.txt";
-    private static final String inputFile = "csp_task/data/d-15-01.txt.txt";
+    // private static final String inputFile = "csp_task/data/d-15-01.txt.txt";
 
     public static void error(String funcname, String errmsg) {
         System.out.println("[ERROR] " + funcname + ": " + errmsg);

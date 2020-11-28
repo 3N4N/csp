@@ -2,14 +2,32 @@ package csp;
 
 import java.util.*;
 
+/**
+ * Holds the state of a Latin Square.
+ */
 public class Square {
+    /**
+     * The size of the Latin Square.
+     */
     int size;
+    /**
+     * The cells in a Latin Square.
+     */
     Cell[][] cells;
 
+    /**
+     * Constructor.
+     * <p>
+     * Does NOT initialize cells.
+     * @see #init()
+     */
     Square() {
         this.size = -1;
     }
 
+    /**
+     * Initializes the cells.
+     */
     public void init() {
         String funcname = "initArr";
         if(cells != null) {
@@ -28,30 +46,60 @@ public class Square {
         }
     }
 
+    /**
+     * Updates the domains of the cells according to the current state.
+     */
     public void update() {
+        /*
+         * Loop over all the cells.
+         */
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
+
+                /*
+                 * If this cell is unassigned, update its domain list.
+                 * Else, clear its domain list except the current value.
+                 */
                 if (cells[i][j].val == 0) {
                     cells[i][j].possVals.clear();
                     for (int k = 1; k <= size; k++) {
-                        if (isValid(i, j, k)) cells[i][j].possVals.add(k);
+                        if (isValid(i, j, k))
+                            cells[i][j].possVals.add(k);
                     }
                 } else {
                     cells[i][j].possVals.clear();
                     cells[i][j].possVals.add(cells[i][j].val);
                 }
+
             }
         }
     }
 
+    /**
+     * Checks if a value is a valid assignment for a cell.
+     * <p>
+     * A value is valid if no other cell in the same row or col
+     * already holds that value.
+     *
+     * @param row the row of the cell
+     * @param col the col of the cell
+     * @param num the val to be assigned
+     * @return true if num is a valid assignment
+     */
     public boolean isValid(int row, int col, int num) {
-        for (int y = 0; y < size; y++) {
-            if (cells[row][y].val == num) return false;
-        }
         for (int x = 0; x < size; x++) {
+            /*
+             * If a cell in either the same row or same col
+             * holds the value num, the assignment is invalid.
+             */
+            if (cells[row][x].val == num) return false;
             if (cells[x][col].val == num) return false;
         }
 
+        /*
+         * If no in either the same row or same col
+         * holds the value num, the assignment is valid.
+         */
         return true;
     }
 
@@ -83,6 +131,14 @@ public class Square {
         return false;
     }
 
+    /**
+     * Checks if all the cells are assigned a value.
+     * <p>
+     * Does NOT check if the cells holds valid values.
+     * @see #isSolved()
+     *
+     * @return true if no unassigned cell
+     */
     public boolean allAssigned() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -94,6 +150,14 @@ public class Square {
         return true;
     }
 
+    /**
+     * Checks if the Latin Square is solved.
+     * <p>
+     * A Latin Square is solved when all its cells are assigned
+     * and no cell holds a value the same as any other cell in its row and col.
+     *
+     * @return true if the square is solved
+     */
     public boolean isSolved() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -115,6 +179,14 @@ public class Square {
         return true;
     }
 
+    /**
+     * Checks if any unassigned cell has a nil domain.
+     * <p>
+     * Any unassigned cell having no domain means
+     * the current state of the board is unsolvable.
+     *
+     * @return true if any unassigned cell have zero domain.
+     */
     public boolean noPosVal() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -137,8 +209,6 @@ public class Square {
         int col = cell.col;
         Integer[] list = cell.possVals.toArray(new Integer[0]);
 
-        // for (int i = 0; i < list.length; i++) {
-        //     Integer num = list[i];
         for (Integer num : list) {
             cell.val = num;
             cell.possVals.clear();
@@ -173,6 +243,11 @@ public class Square {
         return false;
     }
 
+    /**
+     * Chooses an unassigned cell using a sequential search.
+     *
+     * @return an unassigned cell.
+     */
     public Cell seqH() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -184,27 +259,37 @@ public class Square {
         return null;
     }
 
+    /**
+     * Chooses an unassigned cell using SDF heuristic.
+     * <p>
+     * SDF: Smallest Domain First.
+     * It prefers the unassigned cell with smaller domain.
+     * <p>
+     * If multiples cells tie, it choses the first one it found
+     * while searching in a sequential manner.
+     *
+     * @return the unassigned cell with the smallest domain
+     */
     public Cell sdfH() {
-        ArrayList<Cell> unassigned = new ArrayList<>(size);
+        int min = Integer.MAX_VALUE;
+        Cell cell = null;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0) {
-                    unassigned.add(cells[i][j]);
+                if (cells[i][j].val == 0 && cells[i][j].possVals.size() < min) {
+                    min = cells[i][j].possVals.size();
+                    cell = cells[i][j];
                 }
             }
         }
 
-        int min = Integer.MAX_VALUE;
-        Cell cell = null;
-        for (int i = 0; i < unassigned.size(); i++) {
-            if (unassigned.get(i).possVals.size() < min) {
-                min = unassigned.get(i).possVals.size();
-                cell = unassigned.get(i);
-            }
-        }
         return cell;
     }
 
+    /**
+     * Solves this Latin Square.
+     *
+     * @return true if the square is solved.
+     */
     public boolean solve() {
         // return btSeq(0, 0);
         // return backtrack(0,0);
