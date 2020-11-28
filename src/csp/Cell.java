@@ -22,5 +22,5 @@ public class Cell {
      *     in the same row or same col of this cell holds that value.
      * <ol>
      */
-    ArrayList<Integer> possVals;
+    ArrayList<Integer> domain;
 }

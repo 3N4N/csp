@@ -19,6 +19,7 @@ public class Square {
      * Constructor.
      * <p>
      * Does NOT initialize cells.
+     *
      * @see #init()
      */
     Square() {
@@ -30,7 +31,7 @@ public class Square {
      */
     public void init() {
         String funcname = "initArr";
-        if(cells != null) {
+        if (cells != null) {
             CSP.error(funcname, "Square already set");
         }
 
@@ -41,7 +42,7 @@ public class Square {
                 cells[i][j] = new Cell();
                 cells[i][j].row = i;
                 cells[i][j].col = j;
-                cells[i][j].possVals = new ArrayList<>(size);
+                cells[i][j].domain = new ArrayList<>(size);
             }
         }
     }
@@ -61,14 +62,14 @@ public class Square {
                  * Else, clear its domain list except the current value.
                  */
                 if (cells[i][j].val == 0) {
-                    cells[i][j].possVals.clear();
+                    cells[i][j].domain.clear();
                     for (int k = 1; k <= size; k++) {
                         if (isValid(i, j, k))
-                            cells[i][j].possVals.add(k);
+                            cells[i][j].domain.add(k);
                     }
                 } else {
-                    cells[i][j].possVals.clear();
-                    cells[i][j].possVals.add(cells[i][j].val);
+                    cells[i][j].domain.clear();
+                    cells[i][j].domain.add(cells[i][j].val);
                 }
 
             }
@@ -107,9 +108,9 @@ public class Square {
      * Checks if all the cells are assigned a value.
      * <p>
      * Does NOT check if the cells holds valid values.
-     * @see #isSolved()
      *
      * @return true if no unassigned cell
+     * @see #isSolved()
      */
     public boolean allAssigned() {
         for (int i = 0; i < size; i++) {
@@ -151,6 +152,17 @@ public class Square {
         return true;
     }
 
+    public boolean nildom() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j].val == 0 && cells[i][j].domain.size() == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Checks if any unassigned cell has a nil domain.
      * <p>
@@ -159,33 +171,30 @@ public class Square {
      *
      * @return true if any unassigned cell have zero domain.
      */
-    public boolean fowardcheck() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0 && cells[i][j].possVals.size() == 0)
-                    return true;
-            }
-        }
-        return false;
+    public boolean forwardCheck(Cell cell, Integer val) {
+        assign(cell, val);
+        boolean ret = nildom();
+        unassign(cell, val);
+        return ret;
     }
 
     /**
      * Assigns a value to a cell and updates the domains of its neighbours.
      *
      * @param cell the cell to be assigned val
-     * @param val the value to be assigned to cell
+     * @param val  the value to be assigned to cell
      */
     public void assign(Cell cell, Integer val) {
         int row = cell.row;
         int col = cell.col;
 
         cell.val = val;
-        cell.possVals.clear();
-        cell.possVals.add(val);
+        cell.domain.clear();
+        cell.domain.add(val);
 
         for (int x = 0; x < size; x++) {
-            cells[x][col].possVals.remove(val);
-            cells[row][x].possVals.remove(val);
+            if (x != row) cells[x][col].domain.remove(val);
+            if (x != col) cells[row][x].domain.remove(val);
         }
     }
 
@@ -197,20 +206,20 @@ public class Square {
         int col = cell.col;
 
         cell.val = 0;
-        cell.possVals.clear();
+        cell.domain.clear();
         for (int k = 1; k <= size; k++) {
             if (isValid(row, col, k))
-                cell.possVals.add(k);
+                cell.domain.add(k);
         }
 
         for (int x = 0; x < size; x++) {
-            if (isValid(x, col, val)
-                    && !cells[x][col].possVals.contains(val)) {
-                cells[x][col].possVals.add(val);
+            if (isValid(x, col, val) && x != row
+                    && !cells[x][col].domain.contains(val)) {
+                cells[x][col].domain.add(val);
             }
-            if (isValid(row, x, val)
-                    && !cells[row][x].possVals.contains(val)) {
-                cells[row][x].possVals.add(val);
+            if (isValid(row, x, val) && x != col
+                    && !cells[row][x].domain.contains(val)) {
+                cells[row][x].domain.add(val);
             }
         }
     }
@@ -222,15 +231,17 @@ public class Square {
 
         // Cell cell = seqH();
         Cell cell = sdfH();
-        Integer[] list = cell.possVals.toArray(new Integer[0]);
+        Integer[] list = cell.domain.toArray(new Integer[0]);
 
         for (Integer val : list) {
-            assign(cell, val);
+            // if (forwardCheck(cell, val)) {
+            if (ac3(cell, val)) {
+                assign(cell, val);
 
-            // if (backtrack()) return true;
-            if (!fowardcheck() && backtrack()) return true;
+                if (backtrack()) return true;
 
-            unassign(cell, val);
+                unassign(cell, val);
+            }
         }
 
         return false;
@@ -268,14 +279,86 @@ public class Square {
         Cell cell = null;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0 && cells[i][j].possVals.size() < min) {
-                    min = cells[i][j].possVals.size();
+                if (cells[i][j].val == 0 && cells[i][j].domain.size() < min) {
+                    min = cells[i][j].domain.size();
                     cell = cells[i][j];
                 }
             }
         }
 
         return cell;
+    }
+
+    public boolean areSameCell(Cell c1, Cell c2) {
+        return c1.row == c2.row && c1.col == c2.col;
+    }
+
+    public boolean areNeighbours(Cell c1, Cell c2) {
+        return ((c1.row == c2.row || c1.col == c2.col));
+    }
+
+    public boolean revise(Cell c1, Cell c2) {
+        if (!areNeighbours(c1, c2)) return false;
+//        if (c1.val != 0) return false;
+
+        boolean removed = false;
+        ArrayList<Integer> tempList = new ArrayList<>();
+
+        for (Integer val1 : c1.domain) {
+            for (Integer val2 : c2.domain) {
+//                if (c2.domain.get(0).equals(val1)) {
+                if (val2.equals(val1)) {
+                    System.out.println("lsdkfj");
+                    tempList.add(val1);
+                }
+            }
+        }
+
+        if (tempList.size() > 0) {
+            c1.domain.removeAll(tempList);
+            removed = true;
+        }
+
+        return removed;
+    }
+
+    public boolean ac3(Cell cell, Integer val) {
+        assign(cell, val);
+        if (!nildom()) {
+            unassign(cell, val);
+            return false;
+        }
+        ArrayList<Arc> queue = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (i != cell.row && j != cell.col)
+                    queue.add(new Arc(cells[i][j], cell));
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            Arc arc = queue.remove(0);
+            Cell c1 = arc.getC1();
+            Cell c2 = arc.getC2();
+
+            if (revise(c1, c2)) {
+                if (c1.domain.size() == 0) {
+                    System.out.println("HEre:");
+                    unassign(cell, val);
+                    return false;
+                }
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        if (cells[i][j] != c1 && cells[i][j] != c2)
+                            queue.add(new Arc(cells[i][j], c1));
+                    }
+                }
+            }
+        }
+
+        unassign(cell, val);
+        return true;
     }
 
     /**
