@@ -10,11 +10,11 @@ public class CSP {
     public static int nodeVisited = 0;
 
     private static final String errdata = "Data file corrupted.";
-    // private static final String inputFile = "csp_task/data/d-10-01.txt.txt";
+    private static final String inputFile = "csp_task/data/d-10-01.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-06.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-07.txt.txt";
     // private static final String inputFile = "csp_task/data/d-10-08.txt.txt";
-    private static final String inputFile = "csp_task/data/d-10-09.txt.txt";
+    // private static final String inputFile = "csp_task/data/d-10-09.txt.txt";
     // private static final String inputFile = "csp_task/data/d-15-01.txt.txt";
 
     public static void error(String funcname, String errmsg) {
@@ -41,10 +41,10 @@ public class CSP {
                 return false;
             }
 
-            square.size = parseInt(line.substring(2, line.length() - 1));
-            System.out.println("The size of the square: " + square.size);
+            int size = parseInt(line.substring(2, line.length() - 1));
+            System.out.println("The size of the square: " + size);
 
-            square.init();
+            square = new Square(size);
 
             line = readNextLine(br);
             if (!line.equals("start=")) {
@@ -68,7 +68,7 @@ public class CSP {
                 }
                 String [] tokens = line.split(",");
                 for (int i = 0; i < tokens.length; i++){
-                    square.cells[square.size - loop - 1][i].val = parseInt(tokens[i]);
+                    square.cells[square.size - loop - 1][i] = parseInt(tokens[i]);
                 }
             }
 
@@ -84,7 +84,6 @@ public class CSP {
         String funcname = "main";
         System.out.println("-------[ CSP starting ]-------");
 
-        square = new Square();
         if(!init()) {
             error(funcname, "File could not be read.");
             return;
@@ -92,8 +91,6 @@ public class CSP {
 
         System.out.println("\nGiven unsolved Latin Square:");
         System.out.println(square);
-
-        square.update();
 
         nodeVisited = 0;
         if (square.solve() && square.isSolved()) {
