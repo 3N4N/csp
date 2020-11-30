@@ -152,37 +152,11 @@ public class Square {
         return true;
     }
 
-    public boolean nildom() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0 && cells[i][j].domain.size() == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Checks if any unassigned cell has a nil domain.
-     * <p>
-     * Any unassigned cell having no domain means
-     * the current state of the board is unsolvable.
-     *
-     * @return true if any unassigned cell have zero domain.
-     */
-    public boolean forwardCheck(Cell cell, Integer val) {
-        assign(cell, val);
-        boolean ret = nildom();
-        unassign(cell, val);
-        return ret;
-    }
-
     /**
      * Assigns a value to a cell and updates the domains of its neighbours.
      *
-     * @param cell the cell to be assigned val
-     * @param val  the value to be assigned to cell
+     * @param cell the cell
+     * @param val  the value
      */
     public void assign(Cell cell, Integer val) {
         int row = cell.row;
@@ -200,6 +174,9 @@ public class Square {
 
     /**
      * Unassigns a cell and updates the domains its neighbours.
+     *
+     * @param cell the cell
+     * @param val  the value
      */
     public void unassign(Cell cell, Integer val) {
         int row = cell.row;
@@ -224,6 +201,94 @@ public class Square {
         }
     }
 
+
+    /**
+     * Checks if two cells are neighbours.
+     * <p>
+     * Two cells are neighbours if they reside
+     * in the same row or the same col.
+     * @param c1 one of the cells
+     * @param c2 the other cell
+     * @return true if c1 and c2 are neighbours
+     */
+    public boolean areNeighbours(Cell c1, Cell c2) {
+        if (c1 == c2) return false;
+        return (c1.row == c2.row || c1.col == c2.col);
+    }
+
+    /**
+     * Checks the consistency of two neighbouring cells.
+     * @param c1 one of the cells
+     * @param c2 the other cell
+     * @return true if c1 and c2 are consistent
+     */
+    public boolean revise(Cell c1, Cell c2) {
+        boolean removed = false;
+
+        ArrayList<Integer> templist = new ArrayList<>();
+        for (Integer val : c1.domain) {
+            if (c2.domain.size() == 1 && c2.domain.get(0).equals(val)) {
+                // System.out.println("C1: " + c1.row + "," + c1.col + c1.domain);
+                // System.out.println("C2: " + c2.row + "," + c2.col + c2.domain);
+                // scn.nextLine();
+                templist.add(val);
+                removed = true;
+            }
+        }
+        c1.domain.removeAll(templist);
+
+        return removed;
+    }
+
+    public boolean forwardCheck(Cell cell, boolean lookahead) {
+        // assign(cell, val);
+
+        ArrayList<Arc> queue = new ArrayList<>();
+
+        // System.out.println("Cell: " + cell.row + "," + cell.col + cell.domain);
+        for (int x = 0; x < size; x++) {
+            Cell ck = cells[x][cell.col];
+            Cell cm = cells[cell.row][x];
+            if (ck != cell && ck.val == 0) {
+                queue.add(new Arc(ck, cell));
+                // System.out.println("C1: " + ck.row + "," + ck.col + ck.domain);
+            }
+            if (cm != cell && cm.val == 0) {
+                queue.add(new Arc(cm, cell));
+                // System.out.println("C2: " + cm.row + "," + cm.col + cm.domain);
+            }
+        }
+
+        boolean consistent = true;
+        while (!queue.isEmpty() && consistent) {
+            Arc arc = queue.remove(0);
+            Cell c1 = arc.getC1();
+            Cell c2 = arc.getC2();
+
+            if (revise(c1, c2)) {
+                if (lookahead) {
+                    for (int x = 0; x < size; x++) {
+                        Cell ci = cells[x][c1.col];
+                        Cell cj = cells[c1.row][x];
+                        if (ci != c1 && ci != c2 && ci.val == 0) {
+                            queue.add(new Arc(ci, c1));
+                        }
+                        if (cj != c1 && cj != c2 && cj.val == 0) {
+                            queue.add(new Arc(cj, c1));
+                        }
+                    }
+                }
+                if (c1.domain.size() == 0) {
+                    System.out.println("HEre:");
+                    consistent = false;
+                }
+            }
+        }
+
+        // unassign(cell, val);
+        return consistent;
+    }
+
     public boolean backtrack() {
         CSP.nodeVisited++;
 
@@ -234,14 +299,18 @@ public class Square {
         Integer[] list = cell.domain.toArray(new Integer[0]);
 
         for (Integer val : list) {
-            // if (forwardCheck(cell, val)) {
-            if (ac3(cell, val)) {
-                assign(cell, val);
-
+            ArrayList<Integer> tmpDom = new ArrayList<>(cell.domain);
+            cell.val = val;
+            cell.domain.clear();
+            cell.domain.add(val);
+            if (forwardCheck(cell, true)) {
+                // assign(cell, val);
                 if (backtrack()) return true;
-
-                unassign(cell, val);
+                // unassign(cell, val);
             }
+            cell.val = 0;
+            cell.domain.clear();
+            cell.domain.addAll(tmpDom);
         }
 
         return false;
@@ -269,7 +338,7 @@ public class Square {
      * SDF: Smallest Domain First.
      * It prefers the unassigned cell with smaller domain.
      * <p>
-     * If multiples cells tie, it choses the first one it found
+     * If multiples cells tie, it chooses the first one it found
      * while searching in a sequential manner.
      *
      * @return the unassigned cell with the smallest domain
@@ -287,78 +356,6 @@ public class Square {
         }
 
         return cell;
-    }
-
-    public boolean areSameCell(Cell c1, Cell c2) {
-        return c1.row == c2.row && c1.col == c2.col;
-    }
-
-    public boolean areNeighbours(Cell c1, Cell c2) {
-        return ((c1.row == c2.row || c1.col == c2.col));
-    }
-
-    public boolean revise(Cell c1, Cell c2) {
-        if (!areNeighbours(c1, c2)) return false;
-//        if (c1.val != 0) return false;
-
-        boolean removed = false;
-        ArrayList<Integer> tempList = new ArrayList<>();
-
-        for (Integer val1 : c1.domain) {
-            for (Integer val2 : c2.domain) {
-//                if (c2.domain.get(0).equals(val1)) {
-                if (val2.equals(val1)) {
-                    System.out.println("lsdkfj");
-                    tempList.add(val1);
-                }
-            }
-        }
-
-        if (tempList.size() > 0) {
-            c1.domain.removeAll(tempList);
-            removed = true;
-        }
-
-        return removed;
-    }
-
-    public boolean ac3(Cell cell, Integer val) {
-        assign(cell, val);
-        if (!nildom()) {
-            unassign(cell, val);
-            return false;
-        }
-        ArrayList<Arc> queue = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i != cell.row && j != cell.col)
-                    queue.add(new Arc(cells[i][j], cell));
-            }
-        }
-
-        while (!queue.isEmpty()) {
-            Arc arc = queue.remove(0);
-            Cell c1 = arc.getC1();
-            Cell c2 = arc.getC2();
-
-            if (revise(c1, c2)) {
-                if (c1.domain.size() == 0) {
-                    System.out.println("HEre:");
-                    unassign(cell, val);
-                    return false;
-                }
-                for (int i = 0; i < size; i++) {
-                    for (int j = 0; j < size; j++) {
-                        if (cells[i][j] != c1 && cells[i][j] != c2)
-                            queue.add(new Arc(cells[i][j], c1));
-                    }
-                }
-            }
-        }
-
-        unassign(cell, val);
-        return true;
     }
 
     /**
