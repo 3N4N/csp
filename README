@@ -4,35 +4,80 @@ Constraint Satisfaction Problem
 This is an assignment for Level-3/Term-2.
 
 
+Overview
+--------
+
+A solution of constraint satisfaction problem for Latin Squares. The algorithms
+used are from the following websites.
+
+1. https://ktiml.mff.cuni.cz/~bartak/constraints/ordering.html
+2. https://ktiml.mff.cuni.cz/~bartak/constraints/consistent.html
+3. https://ktiml.mff.cuni.cz/~bartak/constraints/propagation.html
+
+The algorithm does not work as expected for the input of N = 15. It solves the
+problem only when Forward Checking or Looking Ahead schemes are used, not when
+normal backtracking is used.
+
+
 Results
 -------
 
 - N = 10 (csp_task/data/d-10-01.txt.txt)
-  - Normal backtracking     : 44379
-  - Forward checking        : 5639
-  - Forward checking w/ SDF : 341
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------|
+    | Normal backtracking     | 196597        | 720      |
+    | Forward checking        | 12314         | 58       |
+    | Looking  ahead          | 176           | 58       |
+    +-------------------------+---------------+----------+
 
 - N = 10 (csp_task/data/d-10-06.txt.txt)
-  - Normal backtracking     : 2394
-  - Forward checking        : 99
-  - Forward checking w/ SDF : 58
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------+
+    | Normal backtracking     | 5010484       | 720      |
+    | Forward checking        | 190464        | 59       |
+    | Looking  ahead          | 452           | 58       |
+    +-------------------------+---------------+----------+
 
 - N = 10 (csp_task/data/d-10-07.txt.txt)
-  - Normal backtracking     : 44826
-  - Forward checking        : 1553
-  - Forward checking w/ SDF : 548
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------+
+    | Normal backtracking     | 17749         | 9041333  |
+    | Forward checking        | 2049          | 734      |
+    | Looking  ahead          | 64            | 252      |
+    +-------------------------+---------------+----------+
 
 - N = 10 (csp_task/data/d-10-08.txt.txt)
-  - Normal backtracking     : 8638
-  - Forward checking        : 1739
-  - Forward checking w/ SDF : 285
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------+
+    | Normal backtracking     | 14028         |1092664   |
+    | Forward checking        | 730           | 314      |
+    | Looking  ahead          | 59            | 165      |
+    +-------------------------+---------------+----------+
 
 - N = 10 (csp_task/data/d-10-09.txt.txt)
-  - Normal backtracking     : 10514
-  - Forward checking        : 408
-  - Forward checking w/ SDF : 58
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------+
+    | Normal backtracking     | 917604        | 635448   |
+    | Forward checking        | 9794          | 58       |
+    | Looking  ahead          | 58            | 58       |
+    +-------------------------+---------------+----------+
 
 - N = 15 (csp_task/data/d-15-01.txt.txt)
-  - Normal backtracking     : 949203162
-  - Forward checking        : 204143450
-  - Forward checking w/ SDF : 1620732
+
+    +-------------------------+---------------+----------+
+    | Scheme                  | Sequential    | SDF      |
+    +-------------------------+---------------+----------+
+    | Normal backtracking     | ???           | ???      |
+    | Forward checking        | 28017271      | 748961   |
+    | Looking  ahead          | 24257         | 223172   |
+    +-------------------------+---------------+----------+

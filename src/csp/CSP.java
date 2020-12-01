@@ -41,10 +41,10 @@ public class CSP {
                 return false;
             }
 
-            square.size = parseInt(line.substring(2, line.length() - 1));
-            System.out.println("The size of the square: " + square.size);
+            int size = parseInt(line.substring(2, line.length() - 1));
+            System.out.println("The size of the square: " + size);
 
-            square.init();
+            square = new Square(size);
 
             line = readNextLine(br);
             if (!line.equals("start=")) {
@@ -68,7 +68,7 @@ public class CSP {
                 }
                 String [] tokens = line.split(",");
                 for (int i = 0; i < tokens.length; i++){
-                    square.cells[square.size - loop - 1][i].val = parseInt(tokens[i]);
+                    square.cells[square.size - loop - 1][i] = parseInt(tokens[i]);
                 }
             }
 
@@ -84,7 +84,6 @@ public class CSP {
         String funcname = "main";
         System.out.println("-------[ CSP starting ]-------");
 
-        square = new Square();
         if(!init()) {
             error(funcname, "File could not be read.");
             return;
@@ -92,8 +91,6 @@ public class CSP {
 
         System.out.println("\nGiven unsolved Latin Square:");
         System.out.println(square);
-
-        square.update();
 
         nodeVisited = 0;
         if (square.solve() && square.isSolved()) {

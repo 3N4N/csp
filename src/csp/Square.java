@@ -6,73 +6,102 @@ import java.util.*;
  * Holds the state of a Latin Square.
  */
 public class Square {
+
     /**
      * The size of the Latin Square.
      */
     int size;
+
     /**
      * The cells in a Latin Square.
-     */
-    Cell[][] cells;
-
-    /**
-     * Constructor.
      * <p>
-     * Does NOT initialize cells.
-     * @see #init()
+     * Holds values. The value is zero if unassigned.
      */
-    Square() {
-        this.size = -1;
-    }
+    int[][] cells;
 
-    /**
-     * Initializes the cells.
-     */
-    public void init() {
-        String funcname = "initArr";
-        if(cells != null) {
-            CSP.error(funcname, "Square already set");
-        }
+    Square(int size) {
+        this.size = size;
 
-        cells = new Cell[size][size];
-
+        cells = new int[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                cells[i][j] = new Cell();
-                cells[i][j].row = i;
-                cells[i][j].col = j;
-                cells[i][j].possVals = new ArrayList<>(size);
+                cells[i][j] = 0;
             }
         }
     }
 
     /**
-     * Updates the domains of the cells according to the current state.
+     * Checks if two cells are neighbours.
+     *
+     * @param p1 a pair containing the row and col of the first cell
+     * @param p2 a pair containing the row and col of the second cell
+     * @return true if p1 and p2 are neighbours
      */
-    public void update() {
-        /*
-         * Loop over all the cells.
-         */
+    public boolean areNeighbours(Pair p1, Pair p2) {
+        return areNeighbours(p1.first, p1.second, p2.first, p2.second);
+    }
+
+    /**
+     * Checks if two cells are neighbours.
+     *
+     * @param r1 row of the first cell
+     * @param c1 col of the first cell
+     * @param r2 row of the second cell
+     * @param c2 col of the second cell
+     * @return true if the cells are neighbours
+     */
+    public boolean areNeighbours(int r1, int c1, int r2, int c2) {
+        /* If the cells are on the same row and the same col
+         * then they are the same cell and cannot be neighbours. */
+        if (r1 == r2 && c1 == c2) return false;
+
+        /* If the cells are either on the same row or the same col
+         * then they are neighbours. */
+        return r1 == r2 || c1 == c2;
+    }
+
+    /**
+     * Returns a list of unassigned cells.
+     *
+     * @return a list of unassigned cells.
+     */
+    public ArrayList<Pair> getVariables() {
+        ArrayList<Pair> variables = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-
-                /*
-                 * If this cell is unassigned, update its domain list.
-                 * Else, clear its domain list except the current value.
-                 */
-                if (cells[i][j].val == 0) {
-                    cells[i][j].possVals.clear();
-                    for (int k = 1; k <= size; k++) {
-                        if (isValid(i, j, k))
-                            cells[i][j].possVals.add(k);
-                    }
-                } else {
-                    cells[i][j].possVals.clear();
-                    cells[i][j].possVals.add(cells[i][j].val);
-                }
-
+                /* The cells with value zero are still unassigned. */
+                if (cells[i][j] == 0)
+                    variables.add(new Pair(i, j));
             }
         }
+        return variables;
+    }
+
+    /**
+     * Returns a list of domains for the unassigned cells.
+     *
+     * @param variables a list of unassigned cells
+     * @return a list of domains for the unassigned cells
+     */
+    public ArrayList<ArrayList<Integer>> getDomains(ArrayList<Pair> variables) {
+        ArrayList<ArrayList<Integer>> domains = new ArrayList<>();
+
+        for (int i = 0; i < variables.size(); i++) {
+            domains.add(new ArrayList<>());
+            Pair pair = variables.get(i);
+            int row = pair.first;
+            int col = pair.second;
+
+            /* If the cell is assigned then ignore it. */
+            if (cells[row][col] != 0) continue;
+
+            for (int num = 1; num <= size; num++) {
+                if (isValid(row, col, num))
+                    domains.get(i).add(num);
+            }
+        }
+
+        return domains;
     }
 
     /**
@@ -88,37 +117,14 @@ public class Square {
      */
     public boolean isValid(int row, int col, int num) {
         for (int x = 0; x < size; x++) {
-            /*
-             * If a cell in either the same row or same col
-             * holds the value num, the assignment is invalid.
-             */
-            if (cells[row][x].val == num) return false;
-            if (cells[x][col].val == num) return false;
+            /* If a cell in either the same row or same col
+             * holds the value num, the assignment is invalid. */
+            if (cells[row][x] == num) return false;
+            if (cells[x][col] == num) return false;
         }
 
-        /*
-         * If no in either the same row or same col
-         * holds the value num, the assignment is valid.
-         */
-        return true;
-    }
-
-    /**
-     * Checks if all the cells are assigned a value.
-     * <p>
-     * Does NOT check if the cells holds valid values.
-     * @see #isSolved()
-     *
-     * @return true if no unassigned cell
-     */
-    public boolean allAssigned() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                int val = cells[i][j].val;
-                if (val == 0) return false;
-            }
-        }
-
+        /* If no in either the same row or same col
+         * holds the value num, the assignment is valid. */
         return true;
     }
 
@@ -133,15 +139,12 @@ public class Square {
     public boolean isSolved() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                int val = cells[i][j].val;
-                if (val == 0) {
-                    return false;
-                }
+                if (cells[i][j] == 0) return false;
                 for (int x = 0; x < size; x++) {
-                    if (x != i && cells[x][j].val == val) {
+                    if (x != i && cells[x][j] == cells[i][j]) {
                         return false;
                     }
-                    if (x != j && cells[i][x].val == val) {
+                    if (x != j && cells[i][x] == cells[i][j]) {
                         return false;
                     }
                 }
@@ -152,104 +155,159 @@ public class Square {
     }
 
     /**
-     * Checks if any unassigned cell has a nil domain.
+     * Checks if this Latin Square is consistent with the constraints.
      * <p>
-     * Any unassigned cell having no domain means
-     * the current state of the board is unsolvable.
+     * A Latin Square is consistent if no two cells
+     * in the a row or a col holds the same value.
      *
-     * @return true if any unassigned cell have zero domain.
+     * @return true if this square is consistent
      */
-    public boolean fowardcheck() {
+    public boolean isConsistent() {
+
+        /* Loop over all the cells */
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0 && cells[i][j].possVals.size() == 0)
-                    return true;
-            }
-        }
-        return false;
-    }
+                /* If cell is unassigned, ignore it. */
+                if (cells[i][j] == 0) continue;
 
-    /**
-     * Assigns a value to a cell and updates the domains of its neighbours.
-     *
-     * @param cell the cell to be assigned val
-     * @param val the value to be assigned to cell
-     */
-    public void assign(Cell cell, Integer val) {
-        int row = cell.row;
-        int col = cell.col;
+                /* Loop over cell's neighbours. */
+                for (int x = 0; x < size; x++) {
 
-        cell.val = val;
-        cell.possVals.clear();
-        cell.possVals.add(val);
-
-        for (int x = 0; x < size; x++) {
-            cells[x][col].possVals.remove(val);
-            cells[row][x].possVals.remove(val);
-        }
-    }
-
-    /**
-     * Unassigns a cell and updates the domains its neighbours.
-     */
-    public void unassign(Cell cell, Integer val) {
-        int row = cell.row;
-        int col = cell.col;
-
-        cell.val = 0;
-        cell.possVals.clear();
-        for (int k = 1; k <= size; k++) {
-            if (isValid(row, col, k))
-                cell.possVals.add(k);
-        }
-
-        for (int x = 0; x < size; x++) {
-            if (isValid(x, col, val)
-                    && !cells[x][col].possVals.contains(val)) {
-                cells[x][col].possVals.add(val);
-            }
-            if (isValid(row, x, val)
-                    && !cells[row][x].possVals.contains(val)) {
-                cells[row][x].possVals.add(val);
-            }
-        }
-    }
-
-    public boolean backtrack() {
-        CSP.nodeVisited++;
-
-        if (allAssigned()) return isSolved();
-
-        // Cell cell = seqH();
-        Cell cell = sdfH();
-        Integer[] list = cell.possVals.toArray(new Integer[0]);
-
-        for (Integer val : list) {
-            assign(cell, val);
-
-            // if (backtrack()) return true;
-            if (!fowardcheck() && backtrack()) return true;
-
-            unassign(cell, val);
-        }
-
-        return false;
-    }
-
-    /**
-     * Chooses an unassigned cell using a sequential search.
-     *
-     * @return an unassigned cell.
-     */
-    public Cell seqH() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0) {
-                    return cells[i][j];
+                    /* If neighbour holds the same value
+                     * return inconsistent. */
+                    if ( x != i && cells[x][j] == cells[i][j])
+                        return false;
+                    if (x != j && cells[i][x] == cells[i][j])
+                        return false;
                 }
             }
         }
-        return null;
+
+        return true;
+    }
+
+    /**
+     * Updates the domain of a cell in keeping with that of a neighbour cell.
+     * <p>
+     * The cells must be neighbouring. Otherwise the method will malfunction.
+     * So ensure calling this method only with IDs neighbouring cells.
+     *
+     * @param domains a list of domains of all unassigned cells
+     * @param i the idx of an unassigned cell
+     * @param j the idx of a neighbouring unassigned cell
+     * @return true if any alternation was needed and false otherwise
+     */
+    public boolean revise(ArrayList<ArrayList<Integer>> domains, int i, int j) {
+        boolean removed = false;
+
+        ArrayList<Integer> tempList = new ArrayList<>();
+        for (Integer val : domains.get(i)) {
+            if (domains.get(j).size() == 1 && domains.get(j).get(0).equals(val)) {
+                tempList.add(val);
+                removed = true;
+            }
+        }
+        domains.get(i).removeAll(tempList);
+
+        return removed;
+    }
+
+    public boolean forwardCheck(ArrayList<Pair> variables,
+                                ArrayList<ArrayList<Integer>> domains,
+                                int cv,
+                                boolean isLookAheadWanted) {
+        ArrayList<Pair> queue = new ArrayList<>();
+
+        for (int i = 0; i < variables.size(); i++) {
+            if (!areNeighbours(variables.get(i), variables.get(cv))) continue;
+            queue.add(new Pair(i, cv));
+        }
+
+        while (!queue.isEmpty()) {
+            Pair arc = queue.remove(0);
+            int k = arc.first;
+            int m = arc.second;
+
+            if (revise(domains, k, m)) {
+                if (domains.get(k).size() == 0) {
+                    return false;
+                }
+
+                if (isLookAheadWanted) {
+                    for (int i = 0; i < variables.size(); i++) {
+                        if (i == k || i == m) continue;
+                        if (areNeighbours(variables.get(i), variables.get(k))) {
+                            queue.add(new Pair(i, k));
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean backtrack(ArrayList<Pair> variables,
+                             ArrayList<ArrayList<Integer>> domains,
+                             boolean isForwardCheckWanted,
+                             boolean isLookAheadWanted) {
+        CSP.nodeVisited++;
+
+        if (!isForwardCheckWanted && !isConsistent()) return false;
+        if (variables.size() == 0) return true;
+
+        int varID = 0;
+        // int varID = sdfH(variables, domains);
+        // int varID = variables.size() - 1;
+        Pair pair = variables.get(varID);
+        ArrayList<Integer> domain = domains.get(varID);
+
+        Collections.swap(variables, varID, variables.size() - 1);
+        Collections.swap(domains, varID, domains.size() - 1);
+
+        for (int i = 0; i < domain.size(); i++) {
+            Integer val = domain.get(i);
+            cells[pair.first][pair.second] = val;
+
+            ArrayList<ArrayList<Integer>> newDomains = new ArrayList<>();
+            for (int a = 0; a < domains.size(); a++) {
+                newDomains.add(new ArrayList<>());
+                for (int b = 0; b < domains.get(a).size(); b++) {
+                    newDomains.get(a).add(domains.get(a).get(b));
+                }
+            }
+
+            newDomains.get(newDomains.size() - 1).clear();
+            newDomains.get(newDomains.size() - 1).add(val);
+
+            boolean resForwardCheck;
+            if (isForwardCheckWanted) {
+                resForwardCheck = forwardCheck(variables,
+                                               newDomains,
+                                               variables.size() - 1,
+                                               isLookAheadWanted);
+            }
+            else resForwardCheck = true;
+
+            if (resForwardCheck) {
+                variables.remove(variables.size() - 1);
+                newDomains.remove(newDomains.size() - 1);
+                if (backtrack(variables,
+                              newDomains,
+                              isForwardCheckWanted,
+                              isLookAheadWanted)) {
+                    return true;
+                }
+                variables.add(pair);
+            }
+
+            cells[pair.first][pair.second] = 0;
+        }
+
+        Collections.swap(variables, varID, variables.size() - 1);
+        Collections.swap(domains, varID, domains.size() - 1);
+
+        return false;
     }
 
     /**
@@ -258,24 +316,28 @@ public class Square {
      * SDF: Smallest Domain First.
      * It prefers the unassigned cell with smaller domain.
      * <p>
-     * If multiples cells tie, it choses the first one it found
+     * If multiples cells tie, it chooses the first one it found
      * while searching in a sequential manner.
      *
      * @return the unassigned cell with the smallest domain
      */
-    public Cell sdfH() {
+    public int sdfH(ArrayList<Pair> variables,
+                    ArrayList<ArrayList<Integer>> domains) {
         int min = Integer.MAX_VALUE;
-        Cell cell = null;
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (cells[i][j].val == 0 && cells[i][j].possVals.size() < min) {
-                    min = cells[i][j].possVals.size();
-                    cell = cells[i][j];
-                }
+        int id = -1;
+
+        for (int i = 0; i < variables.size(); i++) {
+            Pair pair = variables.get(i);
+
+            if (cells[pair.first][pair.second] != 0) continue;
+
+            if (domains.get(i).size() < min) {
+                min = domains.get(i).size();
+                id = i;
             }
         }
 
-        return cell;
+        return id;
     }
 
     /**
@@ -284,7 +346,14 @@ public class Square {
      * @return true if the square is solved.
      */
     public boolean solve() {
-        return backtrack();
+        ArrayList<Pair> variables = getVariables();
+        ArrayList<ArrayList<Integer>> domains = getDomains(variables);
+
+        boolean isForwardCheckWanted = false;
+        boolean isLookAheadWanted = false;
+        isForwardCheckWanted = true;
+        isLookAheadWanted = true;
+        return backtrack(variables, domains, isForwardCheckWanted, isLookAheadWanted);
     }
 
     @Override
@@ -292,9 +361,9 @@ public class Square {
         StringBuilder str = new StringBuilder("\n");
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size - 1; j++) {
-                str.append(cells[i][j].val).append(", ");
+                str.append(cells[i][j]).append(", ");
             }
-            str.append(cells[i][size - 1].val);
+            str.append(cells[i][size - 1]);
             str.append("\n");
         }
         str.append("\n");
